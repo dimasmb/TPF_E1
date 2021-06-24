@@ -4,40 +4,53 @@ import matplotlib.pyplot as plt
 import resources.pasa as pa
 
 
-def salida(tipo, amp, num, den):
+def salida(tipo, amp, num, den, frec=0):
+    n = np.array(num)
+    d = np.array(den)
     if tipo=="Escalon":
-
-        # t, y=ss.step((round(amp)*num, den), T=t)
-        n=np.array(num)
-        d=np.array(den)
-
         n=n*amp
         d = np.append(d, 0)
-        H = ss.TransferFunction(n, d)
-        w = np.logspace(-3, 7, 1000)
-        # w = np.logspace(n - 3, m + 3, 1000)
-        y = ss.bode(H, w=w)
+        fc=int(np.sqrt(abs(1/d[0])))
+        mini=int(np.log10(fc))
+        maxi=mini
+    else:   #if tipo=="Seno":
+        ord=len(den)
+        if type(amp)!=list:
+            return "E"
+        ampli=amp[0]
+        frec=amp[1]
+        a=2*np.pi*frec
+        n=n*amp
+        if ord=="1":
+            d=np.append(d, [(a**2)*n[0], a])
+        else:
+            d=np.array([d[0], d[1], d[0]*(a**2)+1, d[1]*(a**2), a**2])
+        fc = int(np.sqrt(abs(1 / d[0])))
+        mini=min(fc, a)
+        maxi=max(fc, a)
 
 
-        fig, (ax0, ax1) = plt.subplots(2)
-        ax0.plot(w, y[1])
-        ax0.set_xscale("log")
-        ax0.grid()
-        ax0.set_title("Bode")
+    H = ss.TransferFunction(n, d)
+    w = np.logspace(mini - 3, maxi + 3, 1000)
+    y = ss.bode(H, w=w)
 
-        if max(abs(y[1])) < 1:
-            ax0.set_ylim(-1.2, 1.2)
+    fig, (ax0, ax1) = plt.subplots(2)
+    ax0.plot(w, y[1])
+    ax0.set_xscale("log")
+    ax0.grid()
+    st="Bode salida con entrada " + tipo.lower()
+    ax0.set_title(st)
 
-        ax1.plot(w, y[2])
-        ax1.set_xscale("log")
-        ax1.grid()
-        ax1.set_title("Fase")
-        if max(abs(y[2])) < 1:
-            ax1.set_ylim(-1.2, 1.2)
+    if max(abs(y[1])) < 1:
+        ax0.set_ylim(-1.2, 1.2)
 
-        fig.tight_layout()
-        plt.show()
-    elif tipo=="Seno":
+    ax1.plot(w, y[2])
+    ax1.set_xscale("log")
+    ax1.grid()
+    ax1.set_title("Fase")
+    if max(abs(y[2])) < 1:
+        ax1.set_ylim(-1.2, 1.2)
 
-        pass
+    fig.tight_layout()
+    plt.show()
     return

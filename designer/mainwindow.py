@@ -304,7 +304,7 @@ class Ui_MainWindow(object):
         self.comboOrden.setItemText(0, _translate("MainWindow", "1"))
         self.comboOrden.setItemText(1, _translate("MainWindow", "2"))
         self.label_C.setText(_translate("MainWindow", "C"))
-        self.label_polos.setText(_translate("MainWindow", "Polo"))
+        self.label_polos.setText(_translate("MainWindow", "--"))
         self.label_L.setText(_translate("MainWindow", "L"))
         self.label_filtro_2.setText(_translate("MainWindow", "Vout (+ a -)"))
         self.comboVo.setItemText(0, _translate("MainWindow", "1-2"))
@@ -313,9 +313,9 @@ class Ui_MainWindow(object):
         self.comboVo.setItemText(3, _translate("MainWindow", "3-2"))
         self.comboVo.setItemText(4, _translate("MainWindow", "3-4"))
         self.comboVo.setItemText(5, _translate("MainWindow", "4-3"))
-        self.label_gain.setText(_translate("MainWindow", "Ganancia máxima"))
+        self.label_gain.setText(_translate("MainWindow", "Ganancia"))
         self.gain.setText(_translate("MainWindow", "1"))
-        self.label_ceros.setText(_translate("MainWindow", "Cero"))
+        self.label_ceros.setText(_translate("MainWindow", "--"))
         self.label_in.setText(_translate("MainWindow", "Entrada"))
         self.comboIn.setItemText(0, _translate("MainWindow", "Escalon"))
         self.comboIn.setItemText(1, _translate("MainWindow", "Seno"))
@@ -325,7 +325,7 @@ class Ui_MainWindow(object):
         self.label_frec.setText(_translate("MainWindow", "Frecuencia de corte"))
         self.frec_corte.setText(_translate("MainWindow", "1000"))
         self.button_bode.setText(_translate("MainWindow", "Bode"))
-        self.button_out.setText(_translate("MainWindow", "Salida"))
+        self.button_out.setText(_translate("MainWindow", "Bode+salida"))
         self.menuHelp.setTitle(_translate("MainWindow", "Help"))
 
     def showError(self):
@@ -438,7 +438,10 @@ class Ui_MainWindow(object):
             den=y[1]
         tipo=self.comboIn.currentText()
 
-        out.salida(tipo, amp, num, den)
+        flag=out.salida(tipo, amp, num, den)
+        if flag=="E":
+            self.showError()
+            return
 
     """
     Update de labels
@@ -471,6 +474,7 @@ class Ui_MainWindow(object):
         if fil != "Personalizado":
             self.label_ceros.setText("--")
             self.label_polos.setText("--")
+            self.label_frec.setText("Frecuencia de corte")
         else:
             if ord == "2":
                 self.label_ceros.setText(
@@ -480,6 +484,7 @@ class Ui_MainWindow(object):
             else:
                 self.label_ceros.setText("Cero")
                 self.label_polos.setText("Polo")
+                self.label_frec.setText("--")
 
 if __name__ == "__main__":
     import sys
